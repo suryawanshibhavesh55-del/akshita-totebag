@@ -19,10 +19,11 @@ import {
   Heart
 } from "lucide-react";
 import { FaWhatsapp, FaInstagram } from "react-icons/fa";
-import { products } from "@/data/products";
+import { products, Product } from "@/data/products";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import FloatingCTA from "@/components/FloatingCTA";
+import OrderModal from "@/components/OrderModal";
 import ReviewsSection from "@/components/ReviewsSection";
 
 export default function HomePage() {
@@ -40,11 +41,14 @@ export default function HomePage() {
     setIsMounted(true);
   }, []);
 
+  // Order Modal state
+  const [selectedOrderProduct, setSelectedOrderProduct] = useState<Product | null>(null);
+  
   // Dynamic WhatsApp ordering url generator
   const getWhatsAppLink = (productName: string, price: number, imagePath: string) => {
     const origin = isMounted && typeof window !== "undefined" ? window.location.origin : "https://akshitatotebags.com";
     const imageUrl = `${origin}${imagePath}`;
-    const text = `Hello Akshita Tote Bags,\n\nI would like to order / enquire about this bag:\n\nProduct:\n${productName}\n\nPrice:\n₹${price}\n\nProduct Image:\n${imageUrl}\n\nPlease share the available designs and payment details.`;
+    const text = `Hello Akshita Tote Bags,\n\nI would like to order:\n\nProduct: ${productName}\n\nPrice:\n₹${price}\n\nProduct Image:\n${imageUrl}\n\nPlease share the available designs and payment details.`;
     return `https://wa.me/919376445844?text=${encodeURIComponent(text)}`;
   };
 
@@ -113,15 +117,13 @@ export default function HomePage() {
             </p>
             
             <div className="pt-4 flex flex-wrap gap-4 items-center" suppressHydrationWarning>
-              <a
-                href={getWhatsAppLink(heroFeaturedBag.name, heroFeaturedBag.price, heroFeaturedBag.image)}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={() => setSelectedOrderProduct(heroFeaturedBag)}
                 className="inline-flex items-center gap-2 px-8 py-3.5 bg-maroon-primary hover:bg-maroon-light text-white font-sans text-xs tracking-widest font-semibold uppercase rounded-full shadow-lg transition-luxury hover:scale-105 cursor-pointer"
               >
                 <FaWhatsapp className="w-4 h-4 text-gold-accent" />
                 BUY FROM WHATSAPP
-              </a>
+              </button>
               
               <button 
                 onClick={() => {
@@ -403,16 +405,13 @@ export default function HomePage() {
                     
                     {/* Hover Order Overlay */}
                     <div className="absolute inset-0 bg-maroon-dark/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center p-4">
-                      <a
-                        href={getWhatsAppLink(product.name, product.price, product.image)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setSelectedOrderProduct(product); }}
                         className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full font-sans text-[10px] tracking-wider uppercase font-semibold inline-flex items-center gap-1.5 shadow-lg transition-transform duration-300 translate-y-4 group-hover:translate-y-0 cursor-pointer"
                       >
                         <FaWhatsapp className="w-3.5 h-3.5 fill-current" />
                         Quick Order
-                      </a>
+                      </button>
                     </div>
                   </div>
 
@@ -436,16 +435,13 @@ export default function HomePage() {
                       </div>
 
                       {/* Buy WhatsApp Link */}
-                      <a
-                        href={getWhatsAppLink(product.name, product.price, product.image)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setSelectedOrderProduct(product); }}
                         className="inline-flex items-center gap-1 text-[10px] tracking-widest font-semibold uppercase text-white hover:text-gold-accent transition-colors duration-300 font-sans cursor-pointer"
                       >
                         Buy on WhatsApp
                         <ChevronRight className="w-3 h-3" />
-                      </a>
+                      </button>
                     </div>
                   </div>
                 </motion.div>
@@ -498,15 +494,13 @@ export default function HomePage() {
                 Each bag is meticulously hand stitched by master craftsmen, blending traditional techniques with modern style. Celebrate your unique identity with customized embroidered names and beautiful floral designs.
               </p>
               <div>
-                <a
-                  href={getWhatsAppLink(promoFeaturedBag.name, promoFeaturedBag.price, promoFeaturedBag.image)}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <button
+                  onClick={() => setSelectedOrderProduct(promoFeaturedBag)}
                   className="inline-flex items-center gap-2 px-8 py-3.5 bg-maroon-primary hover:bg-maroon-light text-white font-sans text-xs tracking-widest font-semibold uppercase rounded-full shadow-lg transition-luxury hover:scale-105 cursor-pointer"
                 >
                   <FaWhatsapp className="w-4 h-4 text-gold-accent" />
                   BUY FROM WHATSAPP
-                </a>
+                </button>
               </div>
             </div>
 
@@ -930,6 +924,10 @@ export default function HomePage() {
             "priceRange": "$$"
           })
         }}
+      />
+      <OrderModal
+        product={selectedOrderProduct}
+        onClose={() => setSelectedOrderProduct(null)}
       />
     </div>
   );
